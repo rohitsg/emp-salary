@@ -3,6 +3,7 @@ import {config as dotenvConfig} from 'dotenv';
 import * as bodyParser from 'body-parser';
 
 import { authenticateToken, generateAccessToken } from './auth';
+import { getSalary } from 'db';
 
 dotenvConfig();
 
@@ -30,6 +31,14 @@ app.get('/employee', authenticateToken, (req, res) => {
     name: 'emp 1',
     designation: 'software developer',
     salary: '49k'
+  })
+})
+
+
+app.get('/salary', authenticateToken, (req, res) => {
+  const salary = getSalary();
+  res.send({
+    salary
   })
 })
 
