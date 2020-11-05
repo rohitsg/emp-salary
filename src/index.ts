@@ -3,51 +3,53 @@ import {config as dotenvConfig} from 'dotenv';
 import * as bodyParser from 'body-parser';
 
 import { authenticateToken, generateAccessToken } from './auth';
-import { getSalary } from 'db';
+import { getEmployees, getEmployee } from './db';
 
 dotenvConfig();
 
 const app = express();
 app.use(bodyParser.json());
 
-app.get('/employees', authenticateToken, (req, res) => {
-  res.send([{
-    id: 1,
-    name: 'emp 1',
-    designation: 'software developer 3',
-    salary: '40k'
-  }, {
-    id: 2,
-    name: 'emp 2',
-    designation: 'sr. software developer',
-    salary: '60k'
-  }])
+
+app.get('/employee/:id', authenticateToken, async (req, res) => {
+  const id = req.params.id;
+  try {
+    const employee = await getEmployee(id);
+    res.send({
+      employee
+    })
+  } catch (error) {
+    res.status(404).send({
+      error: 'Error while fetching details for employee'
+    })
+  }
 })
 
+app.get('/employees', authenticateToken, async (req, res) => {
+  try {
+    const employees = await getEmployees();
+    res.send({
+      employees
+    })
+  } catch (error) {
+    res.status(404).send({
+      error: 'Error while fetching details for employees'
+    })
+  }
+});
 
-app.get('/employee', authenticateToken, (req, res) => {
-  res.send({
-    id: 1,
-    name: 'emp 1',
-    designation: 'software developer',
-    salary: '49k'
-  })
-})
-
-
-app.get('/salary', authenticateToken, (req, res) => {
-  const salary = getSalary();
-  res.send({
-    salary
-  })
-})
-
-app.post('/generateToken', (req, res) => {
-  const user = req.body;
-  const token = generateAccessToken(user);
-  res.send({
-    token
-  })
+app.post('/generateToken', async (req, res) => {
+  try {
+    const user = req.body;
+    const token = await generateAccessToken(user);
+    res.send({
+      token
+    })
+  } catch (error) {
+    res.status(401).send({
+      message: error.message
+    })
+  }
 })
 
 app.listen(process.env.PORT, () => {
