@@ -8,6 +8,9 @@ create table salary(id serial PRIMARY KEY, salary int NOT NULL, empid int not nu
 nodejs
 
 # how to run
+go to master branch
+git clone https://github.com/rohitsg/emp-salary.git
+cd emp-salary
 npm i
 npm start
 
